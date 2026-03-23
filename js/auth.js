@@ -1,12 +1,8 @@
 import {
     auth,
-    db,
-    doc,
-    onAuthStateChanged,
-    setDoc
+    onAuthStateChanged
 } from "./firebase.js";
 import {
-    createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -27,7 +23,6 @@ onAuthStateChanged(auth, (user) => {
 
 if (isLoginPage) {
     const authForm = document.getElementById("auth-form");
-    const registerButton = document.getElementById("register-btn");
     const messageElement = document.getElementById("auth-message");
 
     const setMessage = (message, isError = false) => {
@@ -50,31 +45,6 @@ if (isLoginPage) {
         }
     });
 
-    registerButton?.addEventListener("click", async () => {
-        const email = authForm.email.value.trim();
-        const password = authForm.password.value.trim();
-
-        if (!email || !password) {
-            setMessage("Inserisci email e password.", true);
-            return;
-        }
-
-        try {
-            const credential = await createUserWithEmailAndPassword(auth, email, password);
-            const username = email.split("@")[0];
-
-            await setDoc(doc(db, "users", credential.user.uid), {
-                username,
-                pfp: "",
-                email
-            }, { merge: true });
-
-            setMessage("Registrazione completata. Reindirizzamento...");
-            window.location.href = "./dashboard.html";
-        } catch (error) {
-            setMessage(getAuthErrorMessage(error), true);
-        }
-    });
 }
 
 if (isDashboardPage) {

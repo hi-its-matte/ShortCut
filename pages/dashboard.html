@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MatteDev ShortCut</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-page">
+    <header class="topbar">
+        
+
+        <div class="topbar-actions">
+            <span id="mode-indicator" class="status-pill">Modalita' normale</span>
+            <button type="button" id="focus-toggle" class="btn-secondary">Schermo intero</button>
+            <button type="button" id="settings-toggle" class="btn-secondary settings-btn">Impostazioni</button>
+            <div class="account-menu-wrap">
+                <button type="button" id="account-toggle" class="account-pill" aria-expanded="false" aria-controls="account-menu">
+                    <div class="account-pill__avatar">
+                        <img id="account-avatar" alt="Profilo utente">
+                        <span id="account-avatar-fallback">M</span>
+                    </div>
+                    <span id="account-name">MatteDev</span>
+                </button>
+
+                <div id="account-menu" class="account-menu" hidden>
+                    <a href="https://account.mattedev.com" target="_blank" rel="noopener noreferrer" class="account-menu__item">Account</a>
+                    <a href="#" id="logout-btn" class="account-menu__item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-layout">
+        <main class="workspace workspace--full">
+            <section class="workspace-hero">
+                <div class="workspace-hero__top">
+                    <div>
+                        <p class="eyebrow">Preview</p>
+                        <h2>Qui sposti, organizzi e sistemi la tua dashboard</h2>
+                    </div>
+                </div>
+                <p>Attiva impostazioni per trascinare widget e shortcut. In modalita' normale i link si aprono con un click.</p>
+            </section>
+
+            <section id="dashboard-board" class="dashboard-board" aria-label="Board shortcut e widget">
+                <div id="widgets-layer" class="board-layer"></div>
+                <div id="shortcuts-layer" class="board-layer"></div>
+            </section>
+
+            <section class="workspace-sections">
+                <section class="panel">
+                    <span class="evidenza">Shortcut</span>
+                    <h2>Aggiungi link rapido</h2>
+
+                    <form id="shortcut-form" class="form-grid">
+                        <label class="field">
+                            <span>Nome</span>
+                            <input type="text" id="title" name="title" placeholder="GitHub" maxlength="30" required>
+                        </label>
+
+                        <label class="field">
+                            <span>Link</span>
+                            <input type="url" id="url" name="url" placeholder="https://github.com" required>
+                        </label>
+
+                        <label class="field">
+                            <span>Icona</span>
+                            <input type="text" id="icon" name="icon" placeholder="es. GH oppure https://..." required>
+                        </label>
+
+                        <button type="submit" class="btn-primary full-width">Aggiungi shortcut</button>
+                    </form>
+
+                    <p id="dashboard-message" class="helper-text" aria-live="polite"></p>
+                </section>
+
+                <section class="panel panel--library">
+                    <span class="evidenza">Widget</span>
+                    <h2>Libreria widget</h2>
+                    <p>Scegli il formato che vuoi aggiungere. Ogni card mostra un'anteprima indicativa della dimensione finale.</p>
+                    <div class="widget-library">
+                        <div class="widget-group">
+                            <p class="widget-group__title">Orologi</p>
+                            <div class="widget-group__grid">
+                                <button type="button" class="library-card" data-add-kind="widget" data-template-id="clock-small">
+                                    <span class="library-card__title">Orologio piccolo</span>
+                                    <span class="library-card__preview preview preview--clock-small">
+                                        <span class="preview-digital">13:05:59</span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                                <button type="button" class="library-card library-card--wide" data-add-kind="widget" data-template-id="clock-large">
+                                    <span class="library-card__title">Orologio grande</span>
+                                    <span class="library-card__preview preview preview--clock-large">
+                                        <span class="preview-digital preview-digital--large">13:05:59</span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                                <button type="button" class="library-card" data-add-kind="widget" data-template-id="clock-analog">
+                                    <span class="library-card__title">Orologio analogico</span>
+                                    <span class="library-card__preview preview preview--clock-analog">
+                                        <span class="preview-analog">
+                                            <span class="preview-analog__hand preview-analog__hand--hour"></span>
+                                            <span class="preview-analog__hand preview-analog__hand--minute"></span>
+                                        </span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="widget-group">
+                            <p class="widget-group__title">Note</p>
+                            <div class="widget-group__grid">
+                                <button type="button" class="library-card" data-add-kind="widget" data-template-id="notes-small">
+                                    <span class="library-card__title">Note piccolo</span>
+                                    <span class="library-card__preview preview preview--notes-small">
+                                        <span class="preview-lines"></span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                                <button type="button" class="library-card library-card--wide" data-add-kind="widget" data-template-id="notes-large">
+                                    <span class="library-card__title">Note grande</span>
+                                    <span class="library-card__preview preview preview--notes-large">
+                                        <span class="preview-lines preview-lines--wide"></span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="widget-group">
+                            <p class="widget-group__title">Meteo</p>
+                            <div class="widget-group__grid">
+                                <button type="button" class="library-card" data-add-kind="widget" data-template-id="weather-small">
+                                    <span class="library-card__title">Meteo piccolo</span>
+                                    <span class="library-card__preview preview preview--weather-small">
+                                        <span class="preview-weather preview-weather--small">
+                                            <span>23 deg</span>
+                                            <span>Parzialmente nuvoloso</span>
+                                        </span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                                <button type="button" class="library-card library-card--wide" data-add-kind="widget" data-template-id="weather-large">
+                                    <span class="library-card__title">Meteo grande</span>
+                                    <span class="library-card__preview preview preview--weather-large">
+                                        <span class="preview-weather preview-weather--large">
+                                            <span class="preview-weather__temp">23 deg</span>
+                                            <span>Temporale</span>
+                                            <span>Vento 14 km/h</span>
+                                        </span>
+                                        <span class="preview-weather__badge"></span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="widget-group">
+                            <p class="widget-group__title">Calendario</p>
+                            <div class="widget-group__grid">
+                                <button type="button" class="library-card" data-add-kind="widget" data-template-id="calendar-small">
+                                    <span class="library-card__title">Calendario piccolo</span>
+                                    <span class="library-card__preview preview preview--calendar-small">
+                                        <span class="preview-calendar-small">
+                                            <span class="preview-calendar-small__day">23</span>
+                                            <span class="preview-calendar-small__meta">Mar 2026</span>
+                                        </span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                                <button type="button" class="library-card library-card--wide" data-add-kind="widget" data-template-id="calendar-large">
+                                    <span class="library-card__title">Calendario grande</span>
+                                    <span class="library-card__preview preview preview--calendar-large">
+                                        <span class="preview-calendar-large">
+                                            <span class="preview-calendar-large__weekdays">L M M G V S D</span>
+                                            <span class="preview-calendar-large__grid">
+                                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+                                                <span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="widget-group">
+                            <p class="widget-group__title">Sistema</p>
+                            <div class="widget-group__grid">
+                                <button type="button" class="library-card" data-add-kind="widget" data-template-id="battery-device">
+                                    <span class="library-card__title">Batteria dispositivo</span>
+                                    <span class="library-card__preview preview preview--battery">
+                                        <span class="preview-battery">
+                                            <span class="preview-battery__body">
+                                                <span class="preview-battery__fill"></span>
+                                            </span>
+                                            <span class="preview-battery__cap"></span>
+                                        </span>
+                                    </span>
+                                    <span class="library-card__hint">Clicca per aggiungere</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="info-list">
+                        <li>In modalita' normale gli shortcut aprono i link.</li>
+                        <li>In modalita' impostazioni trascini widget e shortcut liberamente.</li>
+                    </ul>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="../js/dashboard.js"></script>
+</body>
+</html>

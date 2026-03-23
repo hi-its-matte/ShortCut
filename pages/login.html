@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | MatteDev ShortCut</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="login-page">
+    <main class="login-shell">
+        <section class="login-card">
+            <span class="evidenza">Firebase Auth</span>
+            <h1>MatteDev ShortCut</h1>
+            <p>Accedi o registrati per sincronizzare shortcut e widget sul tuo account Firebase.</p>
+
+            <form id="auth-form" class="form-grid">
+                <label class="field">
+                    <span>Email</span>
+                    <input type="email" id="email" name="email" placeholder="nome@email.com" required>
+                </label>
+
+                <label class="field">
+                    <span>Password</span>
+                    <input type="password" id="password" name="password" placeholder="Minimo 6 caratteri" minlength="6" required>
+                </label>
+
+                <div class="form-actions">
+                    <button type="submit" id="login-btn" class="btn-primary">Login</button>
+                    <button type="button" id="register-btn" class="btn-secondary">Registrati</button>
+                </div>
+            </form>
+
+            <p id="auth-message" class="helper-text" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <script type="module" src="../js/auth.js"></script>
+</body>
+</html>

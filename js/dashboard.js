@@ -36,6 +36,8 @@ const state = {
     user: null,
     editMode: false,
     focusMode: false,
+    fullscreenActive: false,
+    fullscreenFallback: false,
     drag: null,
     shortcuts: [],
     widgets: [],
@@ -47,6 +49,13 @@ const state = {
     shortcutsUnsubscribe: null,
     widgetsUnsubscribe: null
 };
+
+const fullscreenApiSupported = Boolean(
+    dashboardBoard && (
+        dashboardBoard.requestFullscreen ||
+        dashboardBoard.webkitRequestFullscreen
+    )
+);
 
 const widgetTemplates = {
     "clock-small": {
@@ -129,21 +138,13 @@ boardFullscreenButton?.addEventListener("click", async () => {
 });
 
 async function toggleBoardFullscreen() {
-    state.focusMode = !state.focusMode;
-    document.body.classList.toggle("focus-mode", state.focusMode);
-    const nextLabel = state.focusMode ? "Esci schermo intero" : "Schermo intero";
-    if (focusToggle) {
-        focusToggle.textContent = nextLabel;
-    }
-    if (boardFullscreenButton) {
-        boardFullscreenButton.textContent = nextLabel;
+    if (state.focusMode) {
+        await exitFullscreen();
+    } else {
+        await enterFullscreen(dashboardBoard);
     }
 
-    if (state.focusMode) {
-        await enterFullscreen(dashboardBoard);
-    } else {
-        await exitFullscreen();
-    }
+    syncFullscreenUi();
 }
 
 accountToggle?.addEventListener("click", () => {
@@ -975,11 +976,32 @@ function cleanupRealtimeListeners() {
 }
 
 async function enterFullscreen(element) {
-    if (!document.fullscreenElement && element?.requestFullscreen) {
+    if (!element) {
+        state.fullscreenActive = false;
+        state.focusMode = false;
+        state.fullscreenFallback = false;
+        return;
+    }
+
+    if (!fullscreenApiSupported) {
+        enableFullscreenFallback();
+        return;
+    }
+
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         try {
-            await element.requestFullscreen();
+            if (element.requestFullscreen) {
+                await element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            }
+            state.focusMode = true;
+            document.body.classList.add("focus-mode");
+            state.fullscreenActive = true;
+            state.fullscreenFallback = false;
         } catch (error) {
             console.debug("Fullscreen non disponibile:", error);
+            enableFullscreenFallback();
         }
     }
 }
@@ -988,21 +1010,99 @@ async function exitFullscreen() {
     if (document.fullscreenElement && document.exitFullscreen) {
         try {
             await document.exitFullscreen();
+            state.fullscreenActive = false;
+            state.focusMode = false;
+            state.fullscreenFallback = false;
+            document.body.classList.remove("focus-mode");
+            document.body.classList.remove("fullscreen-fallback");
         } catch (error) {
             console.debug("Uscita fullscreen non disponibile:", error);
         }
+        return;
+    }
+
+    if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
+        try {
+            document.webkitExitFullscreen();
+            state.fullscreenActive = false;
+            state.focusMode = false;
+            state.fullscreenFallback = false;
+            document.body.classList.remove("focus-mode");
+            document.body.classList.remove("fullscreen-fallback");
+        } catch (error) {
+            console.debug("Uscita fullscreen webkit non disponibile:", error);
+        }
+        return;
+    }
+
+    state.fullscreenActive = false;
+    state.focusMode = false;
+    state.fullscreenFallback = false;
+    document.body.classList.remove("focus-mode");
+    document.body.classList.remove("fullscreen-fallback");
+    syncFullscreenUi();
+}
+
+function handleFullscreenChange() {
+    if (state.fullscreenFallback) {
+        syncFullscreenUi();
+        return;
+    }
+
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && state.focusMode) {
+        state.focusMode = false;
+        document.body.classList.remove("focus-mode");
+        state.fullscreenActive = false;
+        state.fullscreenFallback = false;
+        document.body.classList.remove("fullscreen-fallback");
+        syncFullscreenUi();
+        return;
+    }
+
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+        state.focusMode = true;
+        state.fullscreenActive = true;
+        state.fullscreenFallback = false;
+        document.body.classList.add("focus-mode");
+        document.body.classList.remove("fullscreen-fallback");
+        syncFullscreenUi();
     }
 }
 
-document.addEventListener("fullscreenchange", () => {
-    if (!document.fullscreenElement && state.focusMode) {
-        state.focusMode = false;
-        document.body.classList.remove("focus-mode");
-        if (focusToggle) {
-            focusToggle.textContent = "Schermo intero";
-        }
-        if (boardFullscreenButton) {
-            boardFullscreenButton.textContent = "Schermo intero";
-        }
+document.addEventListener("fullscreenchange", handleFullscreenChange);
+document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+
+window.addEventListener("resize", updateAppHeight);
+window.addEventListener("orientationchange", updateAppHeight);
+window.visualViewport?.addEventListener("resize", updateAppHeight);
+
+updateAppHeight();
+syncFullscreenUi();
+
+function syncFullscreenUi() {
+    const isActive = state.focusMode && (state.fullscreenActive || state.fullscreenFallback);
+    const nextLabel = isActive ? "Esci schermo intero" : "Schermo intero";
+
+    if (focusToggle) {
+        focusToggle.textContent = nextLabel;
     }
-});
+
+    if (boardFullscreenButton) {
+        boardFullscreenButton.textContent = nextLabel;
+    }
+}
+
+function updateAppHeight() {
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+    document.documentElement.style.setProperty("--app-height", `${Math.round(viewportHeight)}px`);
+}
+
+function enableFullscreenFallback() {
+    state.fullscreenActive = false;
+    state.fullscreenFallback = true;
+    state.focusMode = true;
+    document.body.classList.add("focus-mode", "fullscreen-fallback");
+    updateAppHeight();
+    syncFullscreenUi();
+    setMessage("Schermo intero attivato in modalita' compatibile per iPhone/iOS.");
+}

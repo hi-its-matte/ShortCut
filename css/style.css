@@ -2,6 +2,7 @@
 
 :root {
     color-scheme: dark;
+    --app-height: 100vh;
     --bg-1: #0f0f0f;
     --bg-2: #1a1a1a;
     --bg-3: #000000;
@@ -39,6 +40,14 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+body.focus-mode {
+    overflow: hidden;
+}
+
+body.fullscreen-fallback {
+    overscroll-behavior: none;
 }
 
 button,
@@ -472,7 +481,34 @@ textarea {
 }
 
 .dashboard-page.focus-mode .dashboard-board {
-    min-height: 100vh;
+    min-height: var(--app-height);
+}
+
+.dashboard-page.focus-mode.fullscreen-fallback .dashboard-board {
+    position: fixed;
+    top: env(safe-area-inset-top, 0px);
+    right: 0;
+    bottom: env(safe-area-inset-bottom, 0px);
+    left: 0;
+    width: 100vw;
+    height: auto;
+    min-height: calc(var(--app-height) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    border-radius: 0;
+    border: 0;
+    z-index: 100;
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025));
+    background-size: 32px 32px, 32px 32px, auto;
+}
+
+.dashboard-page.focus-mode .dashboard-layout {
+    padding: 0;
+}
+
+.dashboard-page.focus-mode .topbar {
+    display: none;
 }
 
 .workspace-hero {
@@ -500,7 +536,7 @@ textarea {
 
 .dashboard-board {
     position: relative;
-    min-height: 100vh;
+    min-height: var(--app-height);
     border-radius: 32px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -514,8 +550,8 @@ textarea {
 
 .dashboard-board:fullscreen {
     width: 100vw;
-    height: 100vh;
-    min-height: 100vh;
+    height: var(--app-height);
+    min-height: var(--app-height);
     border-radius: 0;
     border: 0;
     background:
@@ -527,8 +563,8 @@ textarea {
 
 .dashboard-board:-webkit-full-screen {
     width: 100vw;
-    height: 100vh;
-    min-height: 100vh;
+    height: var(--app-height);
+    min-height: var(--app-height);
     border-radius: 0;
     border: 0;
     background:
@@ -1296,6 +1332,12 @@ textarea {
 
     .dashboard-layout {
         padding: 118px 10px 10px;
+    }
+
+    .dashboard-page.focus-mode .dashboard-board {
+        width: 100vw;
+        min-height: var(--app-height);
+        border-radius: 0;
     }
 
     .widget-group__grid {
